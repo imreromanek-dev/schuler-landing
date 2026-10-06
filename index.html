@@ -1,0 +1,1083 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Schuler Auktionen</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ancizar+Serif:wght@600;700;900&family=Figtree:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  /* Layout: mobile-only column (max 450px). Desktop preview shows the page in a 402\d7 874 mask with a 1px frame.
+     Scroll happens inside .scroller; the nav is fixed above it and blended with exclusion so it reads on every background. */
+  :root {
+    --blue: #0D3E8C;
+    --cream: #EFE4D8;
+    --navy: #131B31;
+    --ink: #141414;
+    --mute: #64646E;
+    --soft: #A8AAB6;
+    --line: #D2C7BC;
+    --page: #D7D4D0;
+    --frame: transparent;
+    --dw: 402px; --dh: 874px;
+    --f-display: 'Figtree', system-ui, sans-serif;
+    --f-serif: 'Ancizar Serif', Georgia, serif;
+    --f-body: 'Inter', system-ui, sans-serif;
+    --ease-out: cubic-bezier(.16, 1, .3, 1);
+    color-scheme: light;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { background: var(--page); color: var(--ink); font-family: var(--f-body); -webkit-font-smoothing: antialiased; }
+  h1, h2, h3, p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  svg { display: block; }
+
+  @media (min-width: 451px) { body { margin: 0; min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; } .device { margin: 0 !important; flex: none; } }
+  .device::after { content: ""; position: absolute; inset: 0; border-radius: calc(56px * var(--k, 1)); box-shadow: 0 0 0 calc(9px * var(--k, 1)) #000; pointer-events: none; z-index: 5; }
+  .device { position: relative; margin: 16px auto; width: var(--dw); height: var(--dh); }
+  .app {
+    position: absolute; left: 0; top: 0; isolation: isolate;
+    width: var(--dw); height: var(--dh);
+    border: 0; border-radius: 56px;
+    clip-path: inset(0 round 56px);              /* Safari: overflow+radius alone doesn't clip composited children */
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    overflow: hidden; background: var(--cream);
+    transform-origin: 0 0;
+    content-visibility: visible;
+  }
+  .scroller { position: absolute; inset: 0; overflow-y: hidden; overflow-x: hidden; scrollbar-width: none; overscroll-behavior: contain; }
+  .scroller::-webkit-scrollbar { display: none; }
+  body.ready .scroller { overflow-y: auto; }
+
+  /* ---------- Nav (fixed, exclusion) ---------- */
+  .nav { position: absolute; left: 0; right: 0; top: 0; height: 67px; pointer-events: none; color: #fff; }
+  .nav-logo { z-index: 50; position: absolute; left: 24px; top: 36px; width: 31px; height: 28.1px; pointer-events: auto; visibility: hidden; }
+  body.ready .nav-logo { visibility: visible; }
+  .nav-logo svg { width: 100%; height: 100%; }
+  .nav-logo path { fill: #0D3E8C; transition: fill .45s ease; }
+  .nav-logo.on-dark path { fill: var(--cream); }
+  .nav-menu { z-index: 50; mix-blend-mode: exclusion; position: absolute; right: 22px; top: 39px; width: 41px; height: 22px; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; pointer-events: auto; }
+  .nav-logo, .nav-menu { transition: transform .6s cubic-bezier(.19, 1, .22, 1); }
+  .nav-logo path { transition: fill .45s ease; }
+  .nav-menu .bl { position: absolute; left: 5px; width: 31px; height: 1.5px; top: 10px; background: #fff; transition: transform .6s cubic-bezier(.19, 1, .22, 1), background-color .3s ease; }
+  .nav-menu .bl.a { transform: translateY(-3px); } .nav-menu .bl.b { transform: translateY(3px); }
+  body.menu-open .nav-menu .bl.a { transform: translateY(0) rotate(15deg); }
+  body.menu-open .nav-menu .bl.b { transform: translateY(0) rotate(-15deg); }
+  body.menu-open .nav-logo { transform: translate3d(7px, 0, 0); }
+  body.menu-open .nav-menu { transform: translate3d(-8px, 0, 0); }
+  body.menu-open .nav-logo path, body.menu-open .nav-logo.on-dark path { fill: #fff; }
+  body.menu-flat .nav-menu { mix-blend-mode: normal; }
+  .nav-menu:focus-visible, .nav-logo:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+
+
+  /* ---------- Menu (Figma 133:6232; motion after Haven: bg fade .6s, rows grid 0fr->1fr .5s, staggered rows) ---------- */
+  .menu { position: absolute; inset: 0; z-index: 40; visibility: hidden; transition: visibility 0s linear .9s; }
+  body.menu-open .menu { visibility: visible; transition-delay: 0s; }
+  .m-shade { position: absolute; inset: 0; background: rgba(0,0,0,.1); opacity: 0; transition: opacity .6s cubic-bezier(.19, 1, .22, 1); }
+  body.menu-open .m-shade { opacity: 1; }
+  .m-card { position: absolute; left: 50%; top: 15px; width: 373px; margin-left: -186.5px; max-height: calc(100% - 30px); overflow: hidden; border-radius: 8px; color: #fff; display: flex; flex-direction: column; }
+  .m-card::before { content: ""; position: absolute; inset: 0; background: #0d3e8c; opacity: 0; transition: opacity .6s cubic-bezier(.19, 1, .22, 1) .1s; z-index: -1; }
+  .m-card { isolation: isolate; }
+  body.menu-open .m-card::before { opacity: 1; transition-delay: 0s; }
+  .m-head { height: 77px; flex: none; }
+  .m-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .5s cubic-bezier(.4, 0, .2, 1); min-height: 0; overflow: hidden; }
+  body.menu-open .m-body { grid-template-rows: 1fr; }
+  .m-in { min-height: 0; overflow: hidden; padding: 0 16px 16px; display: flex; flex-direction: column; gap: 16px; }
+  .m-row { opacity: 0; transform: translate3d(0, 22px, 0); transition: transform .3s ease, opacity .3s ease; }
+  body.menu-open .m-row { opacity: 1; transform: none; transition: transform .6s cubic-bezier(.65, 0, 0, 1) calc(.12s + var(--i) * .04s), opacity .6s cubic-bezier(.65, 0, 0, 1) calc(.12s + var(--i) * .04s); }
+  .m-search { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: rgba(237,243,249,.1); color: rgba(255,255,255,.6); font: 400 15px/23px var(--f-body); }
+  .m-search svg { width: 20px; height: 20px; flex: none; color: #fff; }
+  .m-nav { display: flex; flex-direction: column; }
+  .m-item { border-bottom: 1px solid #436aa6; }
+  .m-item > button { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border: 0; background: none; color: #fff; cursor: pointer; text-align: left; font: 700 26px/normal var(--f-serif); letter-spacing: -.13px; }
+  .m-ic { position: relative; width: 22px; height: 22px; flex: none; }
+  .m-ic::before, .m-ic::after { content: ""; position: absolute; left: 3px; right: 3px; top: 50%; height: 1px; margin-top: -.5px; background: #fff; transition: transform .5s cubic-bezier(.4, 0, .2, 1); }
+  .m-ic::after { transform: rotate(90deg); }
+  .m-item.open .m-ic::after { transform: rotate(0deg); }
+  .m-sub { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .5s cubic-bezier(.4, 0, .2, 1); }
+  .m-item.open .m-sub { grid-template-rows: 1fr; }
+  .m-sub > div { min-height: 0; overflow: hidden; padding-left: 2px; }
+  .m-sub a { display: block; padding: 6px 0; font: 500 16px/23px var(--f-body); color: rgba(255,255,255,.8); }
+  .m-sub > div > a:first-child { padding-top: 0; } .m-sub > div::after { content: ""; display: block; height: 12px; }
+  .m-sub > div > a:last-of-type { padding-bottom: 6px; }
+  .m-act { display: flex; align-items: center; gap: 36px; padding-top: 8px; }
+  .m-act svg { width: 20px; height: 20px; color: #fff; }
+  .m-fav { position: relative; display: flex; } .m-fav svg { width: 22px; height: 22px; }
+  .m-fav b { position: absolute; left: 16px; top: -5.5px; height: 17px; padding: 1px 5px; border-radius: 999px; background: #fff; color: #0d3e8c; font: 600 12px/15px var(--f-body); }
+
+  /* ---------- Sections ---------- */
+  .page { background: var(--cream); }
+  /* ---------- Hero scroll sequence (pinned, scrubbed by scroll) ---------- */
+  .seq { position: relative; }
+  .pin { position: sticky; top: 0; overflow: hidden; background: var(--cream); }
+  .hero-txt { position: absolute; left: 16px; right: 16px; top: 311px; will-change: transform, opacity; }
+  .hero-media { position: absolute; left: 16px; right: 16px; top: 505px; height: 352px; background: var(--cream); overflow: hidden; clip-path: inset(100% 0 0 0); }
+  .hero-media.go { clip-path: inset(0 0 0 0); transition: clip-path 1.5s cubic-bezier(.77, 0, .175, 1); }
+  .mv { height: 100%; transform: translate3d(0, 38%, 0); }
+  .hero-media.go .mv { transform: none; transition: transform 2s cubic-bezier(.77, 0, .175, 1); }
+  .no-motion .hero-media { clip-path: none; }
+  .no-motion .mv { transform: none; }
+  .hero-low { top: 867px; }
+  .slides { display: flex; height: 100%; transition: transform .55s ease; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+  .slides.drag { transition: none; cursor: grabbing; }
+  .slide { position: relative; flex: 0 0 100%; height: 100%; overflow: hidden; }
+  .si { position: absolute; inset: 0; transition: transform .55s ease; }
+  .slides.nt, .slides.nt .si { transition: none !important; }
+  .slides.drag .si { transition: none; }
+  .si img[src$="slider-1.jpg"] { object-position: 50% 26%; }
+  .si img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; -webkit-user-drag: none; }
+  .cap { position: absolute; left: 16px; bottom: 16px; width: 175px; box-sizing: border-box; padding: 8px; display: flex; flex-direction: column; gap: 8px; opacity: 0; pointer-events: none; z-index: 3; transition: opacity .45s ease; }
+  .cap::before { content: ""; position: absolute; inset: 0; z-index: -1; background: rgba(255,255,255,.4); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; transition: opacity .7s ease; }
+  .cap.show::before { opacity: 1; }
+  .cap.show.out::before { opacity: 0; transition: opacity .45s ease; }
+  .cap.show { opacity: 1; transition: none; }
+  .cap.show.out { opacity: 0; transition: opacity .45s ease; }
+  .cap small { font: 500 11px/16px var(--f-body); letter-spacing: 1.32px; text-transform: uppercase; color: #64646e; }
+  .cap b { font: 600 19px/20px var(--f-serif); letter-spacing: -.38px; color: #141414; }
+  .hero-low { position: absolute; left: 0; right: 0; }
+  .s-nav { display: flex; align-items: center; justify-content: space-between; gap: 0; padding: 16px; height: 48px; color: #141414; }
+  .s-nav button { width: 16px; height: 16px; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; display: grid; place-items: center; }
+  .s-nav button svg { width: 16px; height: 16px; }
+  .s-nav button:disabled { opacity: .3; cursor: default; }
+  .s-bar { position: relative; flex: 0 0 317px; width: 317px; height: 2px; background: #D2C7BC; margin: 0 6px; }
+  .s-fill { position: absolute; left: 0; top: 0; height: 100%; background: #141414; transition: transform .55s ease, width .3s; }
+  .hero-title { font: 700 82px/69px var(--f-display); letter-spacing: -3.28px; color: var(--blue); }
+  .hero-meta { margin-top: 24px; display: flex; justify-content: space-between; gap: 12px; font: 500 13px/12px var(--f-display); text-transform: uppercase; color: #27272B; white-space: nowrap; }
+    .hero-slider img, .dept-img img, .fav-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .auction { padding: 10px 16px 32px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+  .a-t { display: flex; flex-direction: column; gap: 4px; }
+  .auction h2 { font: 700 24px/normal var(--f-display); letter-spacing: -.96px; color: var(--blue); }
+  .auction p { font: 400 14px/21px var(--f-body); color: #4B4B53; }
+  .btn { display: inline-flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 16px; background: var(--blue); color: var(--cream); font: 700 16px/20px var(--f-display); letter-spacing: -.32px; border: 0; cursor: pointer; }
+  .btn.full { width: 100%; justify-content: center; padding: 15px 24px; }
+  .btn svg { width: 13.94px; height: 11.72px; }
+
+  .navy { background: var(--navy); color: #fff; }
+  .help { padding: 32px 16px; display: flex; flex-direction: column; gap: 32px; }
+  .help-title { display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; border-bottom: 3px solid rgba(239, 228, 216, .1); }
+  .big-h { font: 700 40.815px/39.286px var(--f-serif); letter-spacing: -.8163px; color: #fff; }
+  .lead { font: 400 15px/23px var(--f-body); color: var(--soft); }
+  .path { display: flex; flex-direction: column; gap: 32px; }
+  .path-top { position: relative; padding-top: 80px; }
+  .path-copy { position: relative; display: flex; flex-direction: column; gap: 16px; max-width: 244px; }
+  .path-top.sell .path-copy { max-width: 238px; }
+  .num { position: absolute; left: 0; top: -120px; font: 900 152px/normal var(--f-serif); letter-spacing: -3.04px; color: var(--blue); white-space: nowrap; }
+  .path h3 { font: 700 23px/30px var(--f-display); letter-spacing: -.115px; color: #fff; }
+  .path-copy p { font: 400 14px/21px var(--f-body); color: var(--soft); }
+  .path-copy { position: relative; z-index: 2; }
+  .path-img { z-index: 1; position: absolute; top: -28px; right: -56px; width: 180px; height: 320px; overflow: hidden; }
+  .path-top.sell .path-img { top: -43px; width: 186px; }
+  .path-img img { width: 100%; height: 100%; object-fit: cover; }
+  .steps { display: flex; flex-direction: column; padding-top: 4px; }
+  .step { display: flex; align-items: center; gap: 14px; padding: 12px 0; }
+  .step + .step { border-top: 1px solid #213450; }
+  .step b { font: 600 12px/16px var(--f-body); color: var(--mute); }
+  .step span { flex: 1; min-width: 0; font: 700 18px/20px var(--f-serif); color: #fff; }
+  .link { display: inline-flex; align-items: center; gap: 8px; font: 700 15px/20px var(--f-display); letter-spacing: -.3px; color: var(--cream); }
+  .link svg { width: 16px; height: 16px; }
+  .link.blue { color: var(--blue); padding-top: 8px; }
+  .link.blue svg { width: 13.94px; height: 11.72px; }
+  .path-links { display: flex; flex-direction: column; gap: 16px; }
+
+  /* ---------- "How can we help" scroll-video sequence (frames scrubbed by scroll) ---------- */
+  .hseq { position: relative; }
+  .hpin { position: sticky; top: 0; overflow: hidden; background: var(--navy); }
+  .hmain { position: relative; z-index: 2; will-change: transform, opacity; }
+  .hbox { position: absolute; left: 0; right: 0; top: 190px; z-index: 1; aspect-ratio: 804 / 950; pointer-events: none; will-change: transform;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent); -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent); mask-composite: intersect; }
+  .hbox canvas { display: block; width: 100%; height: 100%; }
+  #hpin2 .hbox { top: 50px; }
+  #hLow2 { top: 573px; }
+  .hmain2 { padding-top: 72px; }
+  .hlow { position: absolute; left: 16px; right: 16px; top: 523px; z-index: 2; display: flex; flex-direction: column; gap: 32px; }
+  .hsteps { display: flex; gap: 8px; }
+  .hs { opacity: 0; transform: translateY(22px); transition: opacity .35s ease, transform .35s ease; }
+  .hseq.done .hs { opacity: 1; transform: none; transition: opacity .9s ease var(--d, 0ms), transform 1.15s var(--ease-out) var(--d, 0ms); }
+  .hsteps .hs { flex: 1 1 0; min-width: 0; border-top: 1px solid #213450; padding-top: 12px; display: flex; flex-direction: column; gap: 16px; }
+  .hsteps .hs b { font: 600 12px/16px var(--f-body); color: var(--mute); }
+  .hsteps .hs span { font: 700 18px/20px var(--f-serif); color: #fff; }
+  .no-motion .hs { opacity: 1; transform: none; }
+
+  .sell-wrap { padding: 32px 16px 48px; }
+
+  .auctions { padding: 32px 16px 16px; display: flex; flex-direction: column; gap: 24px; }
+  .sec-head { display: flex; flex-direction: column; gap: 2px; }
+  .sec-head h2 { font: 700 23px/30px var(--f-display); letter-spacing: -.115px; color: var(--navy); }
+  .sec-head p { font: 400 15px/23px var(--f-body); color: var(--mute); }
+  .keydates { background: #fff; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .eyebrow { font: 500 11px/16px var(--f-body); letter-spacing: 1.32px; text-transform: uppercase; color: var(--mute); }
+  .timeline { display: flex; flex-wrap: wrap; gap: 18px 12px; }
+  .kd { width: calc(50% - 6px); border-top: 1px solid #D4D7DF; padding-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .kd:first-child { border-top-color: var(--blue); }
+  .kd b { font: 600 16px/22px var(--f-body); color: var(--ink); }
+  .kd span { font: 400 12px/16px var(--f-body); color: var(--mute); }
+  .chip { display: inline-block; align-self: flex-start; padding: 2px 6px; border-radius: 4px; background: var(--blue); color: var(--cream); font: 600 11px/16px var(--f-body); letter-spacing: .22px; text-transform: uppercase; white-space: nowrap; }
+  .chip.light { background: #fff; color: var(--blue); }
+  .rows { display: flex; flex-direction: column; }
+  .row { display: flex; align-items: center; gap: 20px; padding: 18px 0; }
+  .row + .row { border-top: 1px solid var(--line); }
+  .row-date { width: 72px; flex: none; display: flex; flex-direction: column; gap: 2px; white-space: nowrap; }
+  .row-date b { font: 700 26px/normal var(--f-serif); letter-spacing: -1.04px; color: var(--ink); }
+  .row-date span { font: 500 11px/16px var(--f-body); letter-spacing: 1.32px; text-transform: uppercase; color: var(--mute); }
+  .row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+  .row-main strong { font: 500 16px/23px var(--f-body); color: var(--ink); }
+  .row-main span.sub { font: 400 13px/19px var(--f-body); color: var(--mute); }
+  .row > svg { width: 18px; height: 18px; flex: none; }
+
+  .depts { background: #fff; padding: 32px 16px; display: flex; flex-direction: column; gap: 28px; }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .dept { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .dept-img { height: 122px; overflow: hidden; background: #EDE6DE; }
+  .dept span.t { font: 700 18px/20px var(--f-serif); color: var(--ink); }
+  .more { display: inline-flex; align-items: center; gap: 8px; padding-top: 8px; font: 700 15px/20px var(--f-display); letter-spacing: -.3px; color: var(--blue); background: none; border: 0; cursor: pointer; align-self: flex-start; }
+  .more svg { width: 16px; height: 16px; }
+
+  .favs { padding: 16px; }
+  .fav-banner { height: 158px; overflow: hidden; }
+  .fav-wrap { padding: 32px 16px 24px; display: flex; flex-direction: column; gap: 24px; }
+  .fav-copy { display: flex; flex-direction: column; gap: 16px; }
+  .checks { display: flex; flex-direction: column; gap: 10px; padding: 6px 0 0; }
+  .checks li { display: flex; align-items: center; gap: 10px; font: 400 14px/21px var(--f-body); color: #fff; }
+  .checks { list-style: none; margin: 0; }
+  .checks svg { width: 18px; height: 18px; flex: none; }
+  .preview { background: #fff; color: var(--ink); padding: 18px; display: flex; flex-direction: column; }
+  .preview > b { font: 700 18px/20px var(--f-serif); padding-bottom: 0; }
+  .lot { display: flex; align-items: center; gap: 12px; padding: 12px 0; }
+  .lot + .lot { border-top: 1px solid var(--line); }
+  .lot-img { width: 52px; height: 52px; flex: none; background: #EDF3F9; overflow: hidden; }
+  .lot-img img { width: 100%; height: 100%; object-fit: cover; }
+  .lot-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .lot-t small { font: 500 10px/14px var(--f-body); letter-spacing: .6px; text-transform: uppercase; color: var(--mute); }
+  .lot-t b { font: 600 18px/20px var(--f-serif); letter-spacing: -.18px; }
+  .lot-t span { font: 400 12px/16px var(--f-body); color: var(--mute); }
+  .lot > svg { width: 18px; height: 18px; flex: none; }
+  .remind { display: flex; align-items: center; gap: 10px; padding: 14px 0; font: 500 13px/18px var(--f-body); }
+  .remind span { flex: 1; }
+  .remind svg:first-child { width: 16px; height: 16px; }
+  .remind svg:last-child { width: 42px; height: 23.6px; }
+  .bar { display: flex; justify-content: space-between; align-items: flex-start; }
+  .bar .heart { position: relative; width: 30px; height: 26px; }
+  .bar .heart svg { position: absolute; left: 0; top: 2px; width: 22px; height: 22px; }
+  .badge { position: absolute; left: 14px; top: -3px; height: 17px; padding: 1px 5px; border-radius: 999px; background: #fff; color: var(--blue); font: 600 12px/15px var(--f-body); }
+  .bar .link svg { width: 20px; height: 20px; }
+
+  .footer { position: relative; overflow: hidden; background: var(--blue); color: #fff; }
+  .f-in { padding: 38px 20px; display: flex; flex-direction: column; gap: 40px; will-change: transform; }
+  .f-ov { position: absolute; inset: 0; background: #000; opacity: .4; pointer-events: none; z-index: 2; }
+  .f-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .f-title { width: 222px; font: 700 50px/41.67px var(--f-display); letter-spacing: -2px; color: var(--cream); }
+  .f-s { width: 31px; height: 28.1px; flex: none; margin-top: 6px; }
+  .f-s path { fill: var(--cream); transform: translateY(58px); }
+  .f-s.draw path { transform: none; transition: transform 1.4s cubic-bezier(.16, 1, .3, 1) .15s; }
+  .f-body { display: flex; flex-direction: column; gap: 32px; }
+  .f-news { display: flex; flex-direction: column; gap: 14px; }
+  .f-news h3 { font: 700 18px/20px var(--f-serif); color: #fff; }
+  .f-news p { font: 400 14px/21px var(--f-body); color: #9FAEBE; margin-top: 6px; }
+  .email { display: flex; align-items: center; gap: 8px; padding: 15px 16px; background: rgba(237, 243, 249, .1); color: rgba(255, 255, 255, .6); font: 400 14px/21px var(--f-body); }
+  .email span { flex: 1; }
+  .email svg { width: 16px; height: 16px; }
+  .addr { font: 400 13px/19px var(--f-body); color: #9FAEBE; }
+  .cols { display: flex; gap: 12px; }
+  .cols > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+  .cols h4 { margin: 0; font: 500 11px/16px var(--f-body); letter-spacing: 1.32px; text-transform: uppercase; color: #9FAEBE; }
+  .cols a { font: 400 14px/21px var(--f-body); color: #fff; white-space: nowrap; }
+  .legal { border-top: 1px solid #365E9C; padding-top: 20px; display: flex; flex-direction: column; gap: 8px; font: 400 12px/16px var(--f-body); color: #9FAEBE; }
+
+  /* ---------- Reveal system ---------- */
+  .ln { display: block; overflow: hidden; padding-block: .12em; margin-block: -.12em; }
+  .ln-i { display: inline-block; transform: translateY(105%) rotate(10deg); transform-origin: 0 100%; will-change: transform; }
+  .in .ln-i, .in.ln-i { transform: none; transition: transform 1.1s var(--ease-out); transition-delay: calc(var(--l, 0) * var(--ls, 90ms) + var(--w, 0) * 35ms + var(--d, 0ms)); }
+  [data-split] { visibility: hidden; }
+  [data-split].split { visibility: visible; }
+  [data-fade] { opacity: 0; transform: translateY(22px); }
+  [data-fade].in { opacity: 1; transform: none; transition: opacity .9s ease var(--d, 0ms), transform 1.15s var(--ease-out) var(--d, 0ms); }
+  [data-media] img { clip-path: inset(100% 0 0 0); transform: scale(1.18); }
+  [data-media].in img { clip-path: inset(0 0 0 0); transform: none; transition: clip-path 1.3s cubic-bezier(.77, 0, .175, 1) var(--d, 0ms), transform 1.6s var(--ease-out) var(--d, 0ms); }
+  .no-motion [data-split] { visibility: visible; }
+  .no-motion .ln-i { transform: none; }
+  .no-motion [data-fade] { opacity: 1; transform: none; }
+    .no-motion [data-media] img { clip-path: none; transform: none; }
+
+  .replay { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); font: 500 12px/1 system-ui, -apple-system, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #111; background: #fff; border: 1px solid var(--frame); border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+  .replay:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+  /* ---------- Loader ---------- */
+  .loader { position: absolute; inset: 0; z-index: 100; pointer-events: none; }
+  .loader[hidden] { display: none !important; }
+  .curtain { position: absolute; inset: 0; background: var(--blue); will-change: transform; }
+  .stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
+
+  @media (max-width: 450px) {
+    .device { margin: 0; width: 100%; height: 100vh; height: 100dvh; }
+    .app { width: 100%; height: 100%; border: 0; border-radius: 0; clip-path: none; -webkit-mask-image: none; transform: none !important; }
+    .replay { display: none; }
+    .device::after { display: none; }
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 14 12"><path d="M13.4062 6.375L8.625 11.1875L8.09375 11.7188L7.03125 10.6562L7.5625 10.125L11.0625 6.59375H0.75H0V5.09375H0.75H11.0625L7.5625 1.59375L7.03125 1.0625L8.09375 0L8.625 0.53125L13.4062 5.3125L13.9375 5.84375L13.4062 6.375Z" fill="currentColor"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 18 18"><path d="M9 15.225C9 15.225 2.25 11.25 2.25 6.675C2.25 4.65 3.825 3 5.775 3C7.125 3 8.25 3.75 9 4.875C9.75 3.75 10.875 3 12.225 3C14.175 3 15.75 4.65 15.75 6.675C15.75 11.25 9 15.225 9 15.225Z" fill="currentColor" stroke="currentColor" stroke-width="1.125" stroke-linejoin="round"/></symbol>
+    <symbol id="i-heart-o" viewBox="0 0 22 22"><path d="M11 18.6082C11 18.6082 2.75 13.7498 2.75 8.15817C2.75 5.68317 4.675 3.6665 7.05833 3.6665C8.70833 3.6665 10.0833 4.58317 11 5.95817C11.9167 4.58317 13.2917 3.6665 14.9417 3.6665C17.325 3.6665 19.25 5.68317 19.25 8.15817C19.25 13.7498 11 18.6082 11 18.6082Z" stroke="currentColor" stroke-width="1.375" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="rgba(255,255,255,.14)"/><path d="m5.2 9.3 2.5 2.5 5-5.4" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 16 16"><path d="M4 10.6668V7.3335C4 6.27263 4.42143 5.25521 5.17157 4.50507C5.92172 3.75492 6.93913 3.3335 8 3.3335C9.06087 3.3335 10.0783 3.75492 10.8284 4.50507C11.5786 5.25521 12 6.27263 12 7.3335V10.6668L13 12.0002H3L4 10.6668Z" stroke="currentColor" stroke-linejoin="round"/><path d="M6.66663 13.6665C6.66663 14.0201 6.8071 14.3593 7.05715 14.6093C7.3072 14.8594 7.64634 14.9998 7.99996 14.9998C8.35358 14.9998 8.69272 14.8594 8.94277 14.6093C9.19282 14.3593 9.33329 14.0201 9.33329 13.6665" stroke="currentColor"/></symbol>
+    <symbol id="i-toggle" viewBox="0 0 42 24"><rect width="42" height="23.625" rx="11.8125" fill="#0D3E8C"/><circle cx="30.1875" cy="11.8125" r="9.1875" fill="white"/></symbol>
+    <symbol id="i-user" viewBox="0 0 20 20"><path d="M10.0001 10.0002C11.841 10.0002 13.3334 8.50778 13.3334 6.66683C13.3334 4.82588 11.841 3.3335 10.0001 3.3335C8.15913 3.3335 6.66675 4.82588 6.66675 6.66683C6.66675 8.50778 8.15913 10.0002 10.0001 10.0002Z" stroke="currentColor" stroke-width="1.25"/><path d="M3.75 16.6667C4.91667 13.9167 7.25 12.5 10 12.5C12.75 12.5 15.0833 13.9167 16.25 16.6667" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></symbol>
+    <symbol id="i-plane" viewBox="0 0 16 16"><path d="M0 9L1.625 8.09375L14.3438 0.9375L16 0L15.75 1.875L14.1875 13.4688L14 15L12.5625 14.4062L9.78125 13.2188L7.5 16L6 15.5V13.75V11.75V11.5938L1.71875 9.75L0 9ZM12.75 12.8438L13.875 4.40625L8.375 10.9688L12.75 12.8438ZM6.9375 10.375L12.5312 3.6875L3.375 8.84375L6.9375 10.375Z" fill="currentColor" fill-opacity="0.6"/></symbol>
+    <symbol id="i-rotate" viewBox="0 0 16 16"><path d="M13.3 8A5.3 5.3 0 1 1 11.7 4.2M13.4 1.8v3.4H10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<div class="device" id="device">
+  <div class="app" id="app">
+
+    <div class="scroller" id="scroller">
+      <main class="page">
+
+        <section class="seq" id="seq">
+          <div class="pin" id="pin">
+            <div class="hero-txt" id="heroTxt">
+              <h1 class="hero-title" data-split data-d="250" data-ls="260">Schuler<br>Auktionen</h1>
+              <div class="hero-meta" data-fade style="--d:1000ms"><span>Art &amp; Antiques in Experienced Hands</span><span>Z&uuml;rich</span></div>
+            </div>
+            <div class="hero-media" id="heroMedia">
+              <div class="mv"><div class="slides" id="slides">
+                <div class="slide"><div class="si"><img src="assets/slider-1.jpg" srcset="assets/slider-1.jpg 1x, assets/slider-1@2x.jpg 2x" alt="" draggable="false"></div></div>
+                <div class="slide"><div class="si"><img src="assets/slider-2.jpg" srcset="assets/slider-2.jpg 1x, assets/slider-2@2x.jpg 2x" alt="" draggable="false"></div></div>
+                <div class="slide"><div class="si"><img src="assets/slider-3.jpg" srcset="assets/slider-3.jpg 1x, assets/slider-3@2x.jpg 2x" alt="" draggable="false"></div></div>
+                <div class="slide"><div class="si"><img src="assets/slider-4.jpg" srcset="assets/slider-4.jpg 1x, assets/slider-4@2x.jpg 2x" alt="" draggable="false"></div></div>
+              </div></div>
+              <div class="cap" id="cap"><small data-split data-manual>Lot 522</small><b data-split data-manual data-d="140">Hans J. Wegner, Armchair &ldquo;GE 260&rdquo;</b></div>
+            </div>
+            <div class="hero-low" id="heroLow">
+              <div class="s-nav">
+                <button type="button" id="sPrev" aria-label="Previous"><svg viewBox="0 0 16 16"><path d="M13.3 8H2.7M6.7 4 2.7 8l4 4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <div class="s-bar"><div class="s-fill" id="sFill"></div></div>
+                <button type="button" id="sNext" aria-label="Next"><svg viewBox="0 0 16 16"><path d="M2.7 8h10.6M9.3 4l4 4-4 4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+              <section class="auction">
+                <div class="a-t">
+                  <h2 data-split>November Auction 2026</h2>
+                  <p data-split>24&ndash;27 November &nbsp;&middot;&nbsp; Viewing 19&ndash;22 November.</p>
+                </div>
+                <a class="btn" href="#" data-fade>Browse lots <svg><use href="#i-arrow"/></svg></a>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <section class="navy">
+          <div class="hseq" id="hseq">
+            <div class="hpin" id="hpin">
+              <div class="help hmain" id="hTxt">
+                <div class="help-title">
+                  <h2 class="big-h" data-split>How can we <br>help?</h2>
+                  <p class="lead" data-split>Two clear paths &mdash; whether you are <br>looking to acquire or to consign.</p>
+                </div>
+                <div class="path">
+                  <div class="path-top">
+                    <div class="path-copy">
+                      <span class="num" data-fade aria-hidden="true">1</span>
+                      <h3 data-split>Bidding &amp; Buying</h3>
+                      <p data-split>Find current and upcoming auctions, browse lots by department and choose how you want to bid in the room, by phone, in writing or online.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="hbox" id="hBox"><canvas id="hCv" role="img" aria-label="Gilt bronze mantel clock"></canvas></div>
+              <div class="hlow" id="hLow">
+                <div class="hsteps">
+                  <div class="hs"><b>01</b><span>Discover the auction</span></div>
+                  <div class="hs"><b>02</b><span>Browse &amp; save lots</span></div>
+                  <div class="hs"><b>03</b><span>Choose your bidding method</span></div>
+                </div>
+                <a class="link hs" href="#">How to buy <svg><use href="#i-arrow"/></svg></a>
+              </div>
+            </div>
+          </div>
+          <div class="hseq" id="hseq2">
+            <div class="hpin" id="hpin2">
+              <div class="help hmain hmain2" id="hTxt2">
+                <div class="path">
+                  <div class="path-top">
+                    <div class="path-copy">
+                      <span class="num" data-fade aria-hidden="true">2</span>
+                      <h3 data-split>Consignment &amp; Selling</h3>
+                      <p data-split>Our specialists offer complimentary valuations and guide you from the first enquiry to settlement discreetly and transparently.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="hbox" id="hBox2"><canvas id="hCv2" role="img" aria-label="Gold and citrine brooch by Cartier"></canvas></div>
+              <div class="hlow" id="hLow2">
+                <div class="hsteps">
+                  <div class="hs"><b>01</b><span>Request a free valuation</span></div>
+                  <div class="hs"><b>02</b><span>Meet the right specialist</span></div>
+                  <div class="hs"><b>03</b><span>Consign &amp; sell at auction</span></div>
+                </div>
+                <a class="link hs" href="#">How to sell <svg><use href="#i-arrow"/></svg></a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="auctions">
+          <div class="sec-head">
+            <h2 data-split>Auctions</h2>
+            <p data-split>Four auction cycles a year in Z&#252;rich.</p>
+            <a class="link blue" href="#" data-fade>Full calendar <svg><use href="#i-arrow"/></svg></a>
+          </div>
+          <div class="keydates" data-fade>
+            <p class="eyebrow">November Auction 2026 &#183; Key dates</p>
+            <div class="timeline">
+              <div class="kd"><b>23.10.</b><span>Consignments close</span></div>
+              <div class="kd"><b>15.11.</b><span>Online catalogue</span></div>
+              <div class="kd"><b>19&#8211;22.11.</b><span>Public viewing</span></div>
+              <div class="kd"><b>24&#8211;27.11.</b><span>Auction days</span></div>
+            </div>
+            <span class="chip">Consign by 23.10.</span>
+          </div>
+          <div class="rows">
+            <a class="row" href="#" data-fade>
+              <div class="row-date"><b>24&#8211;27</b><span>Nov 2026</span></div>
+              <div class="row-main"><span class="chip">upcoming</span><strong>November Auction 2026</strong><span class="sub">Art &#183; Jewellery &#183; Watches &#183; Asian Art</span></div>
+              <svg style="color:var(--ink)"><use href="#i-arrow"/></svg>
+            </a>
+            <a class="row" href="#" data-fade>
+              <div class="row-date"><b>Mar</b><span>2027</span></div>
+              <div class="row-main"><span class="chip light">Consign now</span><strong>March Auction 2027</strong><span class="sub">Consignments now open</span></div>
+              <svg style="color:var(--ink)"><use href="#i-arrow"/></svg>
+            </a>
+            <a class="row" href="#" data-fade>
+              <div class="row-date"><b>Jun</b><span>2027</span></div>
+              <div class="row-main"><span class="chip light">Consign now</span><strong>June Auction 2027</strong><span class="sub">Dates to be announced</span></div>
+              <svg style="color:var(--ink)"><use href="#i-arrow"/></svg>
+            </a>
+          </div>
+        </section>
+
+        <section class="depts">
+          <div class="sec-head">
+            <h2 data-split>Online Catalogue</h2>
+            <p data-split>A182 &#183; Z&#252;rich &#183; Auction from 8 September</p>
+          </div>
+          <div class="grid">
+            <a class="dept" href="#"><div class="dept-img" data-media><img src="assets/dept-1.jpg" srcset="assets/dept-1.jpg 1x, assets/dept-1@2x.jpg 2x" alt=""></div><span class="t" data-split>Antique Weaponry</span></a>
+            <a class="dept" href="#"><div class="dept-img" data-media style="--d:90ms"><img src="assets/dept-2.jpg" srcset="assets/dept-2.jpg 1x, assets/dept-2@2x.jpg 2x" alt=""></div><span class="t" data-split data-d="90">Art Nouveau, Art D&#233;co</span></a>
+            <a class="dept" href="#"><div class="dept-img" data-media><img src="assets/dept-3.jpg" srcset="assets/dept-3.jpg 1x, assets/dept-3@2x.jpg 2x" alt=""></div><span class="t" data-split>Asian Art</span></a>
+            <a class="dept" href="#"><div class="dept-img" data-media style="--d:90ms"><img src="assets/dept-4.jpg" srcset="assets/dept-4.jpg 1x, assets/dept-4@2x.jpg 2x" alt=""></div><span class="t" data-split data-d="90">Carpets</span></a>
+            <a class="dept" href="#"><div class="dept-img" data-media><img src="assets/dept-5.jpg" srcset="assets/dept-5.jpg 1x, assets/dept-5@2x.jpg 2x" alt=""></div><span class="t" data-split>Design</span></a>
+            <a class="dept" href="#"><div class="dept-img" data-media style="--d:90ms"><img src="assets/dept-6.jpg" srcset="assets/dept-6.jpg 1x, assets/dept-6@2x.jpg 2x" alt=""></div><span class="t" data-split data-d="90">European Sculpture &amp; Works of Art</span></a>
+            <a class="dept" href="#"><div class="dept-img" data-media><img src="assets/dept-7.jpg" srcset="assets/dept-7.jpg 1x, assets/dept-7@2x.jpg 2x" alt=""></div><span class="t" data-split>Fashion Accessories</span></a>
+            <a class="dept" href="#"><div class="dept-img" data-media style="--d:90ms"><img src="assets/dept-8.jpg" srcset="assets/dept-8.jpg 1x, assets/dept-8@2x.jpg 2x" alt=""></div><span class="t" data-split data-d="90">Fine Art</span></a>
+          </div>
+          <button class="more" type="button" data-fade><svg><use href="#i-rotate"/></svg>Show 9 more</button>
+        </section>
+
+        <section class="favs">
+          <div class="fav-banner" data-media><img src="assets/fav-banner.jpg" srcset="assets/fav-banner.jpg 1x, assets/fav-banner@2x.jpg 2x" alt="Expressionist beach scene"></div>
+          <div class="fav-wrap navy">
+            <div class="fav-copy">
+              <h2 class="big-h" data-split>Keep track of the lots you love</h2>
+              <p class="lead" data-split>Save lots with one tap, follow them across auctions and get a reminder before they are called.</p>
+              <ul class="checks">
+                <li data-fade><svg><use href="#i-check"/></svg>Synced on phone, tablet and desktop</li>
+                <li data-fade><svg><use href="#i-check"/></svg>Reminder 24 h before your lots are called</li>
+                <li data-fade><svg><use href="#i-check"/></svg>Send as absentee bids in one go</li>
+              </ul>
+            </div>
+            <div class="preview" data-fade>
+              <b>Favourites</b>
+              <div class="lot"><div class="lot-img"><img src="assets/thumb-1.png" alt=""></div><div class="lot-t"><small>Lot 112 &#183; Nov 2026</small><b>Gold wristwatch, Geneva</b><span>CHF 4&#8217;000 &#8211; 6&#8217;000</span></div><svg style="color:var(--blue)"><use href="#i-heart"/></svg></div>
+              <div class="lot"><div class="lot-img"><img src="assets/thumb-2.png" alt=""></div><div class="lot-t"><small>Lot 305 &#183; Nov 2026</small><b>Diamond brooch, c. 1920</b><span>CHF 3&#8217;000 &#8211; 5&#8217;000</span></div><svg style="color:var(--blue)"><use href="#i-heart"/></svg></div>
+              <div class="lot"><div class="lot-img"><img src="assets/thumb-3.png" alt=""></div><div class="lot-t"><small>Lot 406 &#183; Nov 2026</small><b>Pair of fauteuils, Paris</b><span>CHF 2&#8217;000 &#8211; 3&#8217;000</span></div><svg style="color:var(--blue)"><use href="#i-heart"/></svg></div>
+              <div class="remind"><svg style="color:var(--blue)"><use href="#i-bell"/></svg><span>Remind me before the sale</span><svg><use href="#i-toggle"/></svg></div>
+              <a class="btn full" href="#">Send to specialist</a>
+            </div>
+            <div class="bar" data-fade>
+              <div class="heart" style="color:#fff"><svg><use href="#i-heart-o"/></svg><span class="badge">3</span></div>
+              <a class="link" href="#"><svg><use href="#i-user"/></svg>Create account</a>
+            </div>
+          </div>
+        </section>
+
+        <footer class="footer" id="footer"><div class="f-in" id="fIn">
+          <div class="f-top">
+            <div class="f-title" data-split>Schuler<br>Auktionen</div>
+            <svg class="f-s" id="footerS" viewBox="0 0 50.04 45.39" aria-hidden="true"><path id="footerSPath" pathLength="1"/></svg>
+          </div>
+          <div class="f-body">
+            <div class="f-news" data-fade>
+              <div><h3>Stay informed</h3><p>Catalogue releases, auction dates and appraisal days &#8212; four times a year.</p></div>
+              <div class="email"><span>Email address</span><svg><use href="#i-plane"/></svg></div>
+            </div>
+            <div class="addr" data-fade>Seestrasse 341, 8038 Z&#252;rich<br>+41 43 399 70 10<br>info@schulerauktionen.ch<br>Mon&#8211;Fri  09:00&#8211;12:00 &#183; 13:00&#8211;17:00</div>
+            <div class="cols" data-fade>
+              <div><h4>Buy</h4><a href="#">Auctions</a><a href="#">Browse lots</a><a href="#">How to bid</a><a href="#">Results</a></div>
+              <div><h4>Sell</h4><a href="#">How to sell</a><a href="#">Valuation</a><a href="#">Appraisal days</a></div>
+              <div><h4>About</h4><a href="#">Our house</a><a href="#">Contact</a><a href="#">Downloads</a></div>
+            </div>
+            <div class="legal" data-fade><p>DE &#183; EN &#183; FR   &#183;   Terms of sale   &#183;   Privacy</p><p>&#169; 2026 Schuler Auktionen AG</p></div>
+          </div>
+        </div><div class="f-ov" id="fOv"></div></footer>
+
+      </main>
+    </div>
+
+    <div class="menu" id="menu" aria-hidden="true">
+      <div class="m-shade" id="mShade"></div>
+      <div class="m-card"><div class="m-head"></div>
+        <div class="m-body"><div class="m-in">
+          <div class="m-row m-search" style="--i:0"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="9" cy="9" r="5.5"/><path d="M13 13l4 4"/></svg><span>Search lots, artists, departments&hellip;</span></div>
+          <nav class="m-row m-nav" style="--i:1"><div class="m-item"><button type="button" aria-expanded="false">Auctions<span class="m-ic"></span></button><div class="m-sub"><div><a href="#">Current auction</a><a href="#">Upcoming auctions</a><a href="#">After-sale</a><a href="#">Archive</a><a href="#">Press</a></div></div></div><div class="m-item"><button type="button" aria-expanded="false">Catalogue<span class="m-ic"></span></button><div class="m-sub"><div><a href="#">Current catalogue</a><a href="#">Past catalogues</a><a href="#">Subscribe</a></div></div></div><div class="m-item"><button type="button" aria-expanded="false">Bidding &amp; Buying<span class="m-ic"></span></button><div class="m-sub"><div><a href="#">How to bid</a><a href="#">Buyer&rsquo;s guide</a><a href="#">Payment &amp; shipping</a></div></div></div><div class="m-item"><button type="button" aria-expanded="false">Consignment &amp; Selling<span class="m-ic"></span></button><div class="m-sub"><div><a href="#">How to consign</a><a href="#">Free valuation</a><a href="#">Seller&rsquo;s guide</a></div></div></div><div class="m-item"><button type="button" aria-expanded="false">About us<span class="m-ic"></span></button><div class="m-sub"><div><a href="#">Our story</a><a href="#">Team</a><a href="#">Contact</a></div></div></div></nav>
+          <div class="m-row m-act" style="--i:2"><span class="m-fav"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M11 18.5S3 13.6 3 8.3A4.3 4.3 0 0 1 11 6a4.3 4.3 0 0 1 8 2.3c0 5.3-8 10.2-8 10.2z"/></svg><b>3</b></span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="10" cy="7" r="3.2"/><path d="M3.5 17c.6-3.3 3.2-5 6.5-5s5.9 1.7 6.5 5"/></svg><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="10" cy="10" r="7.5"/><ellipse cx="10" cy="10" rx="3.2" ry="7.5"/><path d="M2.5 10h15"/></svg></div>
+        </div></div>
+      </div>
+    </div>
+
+    <header class="nav">
+      <a class="nav-logo" id="navLogo" href="#" aria-label="Schuler Auktionen"><svg viewBox="0 0 50.04 45.39"><path id="navLogoPath"/></svg></a>
+      <button class="nav-menu" type="button" aria-label="Menu"><i class="bl a"></i><i class="bl b"></i></button>
+    </header>
+
+    <div class="loader" id="loader" aria-hidden="true">
+      <div class="curtain" id="curtain"></div>
+      <svg class="stage" id="stage" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="clipS"><path id="clipSPath"/></clipPath>
+          <clipPath id="clipAbove"><rect id="rectAbove" x="0" y="0" width="0" height="0"/></clipPath>
+          <clipPath id="clipBelow"><rect id="rectBelow" x="0" y="0" width="0" height="0"/></clipPath>
+        </defs>
+        <g clip-path="url(#clipAbove)"><path id="solidCream" fill="#EFE4D8" opacity="0"/></g>
+        <g clip-path="url(#clipBelow)"><path id="solidBlue" fill="#0D3E8C" opacity="0"/></g>
+        <g id="imgs" clip-path="url(#clipS)" opacity="0"></g>
+        <path id="lineS" fill="none" stroke="#EFE4D8" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"
+              vector-effect="non-scaling-stroke" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
+      </svg>
+    </div>
+
+  </div>
+</div>
+
+<button class="replay" id="replay" type="button">Replay</button>
+
+
+<script>
+
+(() => {
+  /* ---------- Assets ---------- */
+  const S_PATH = "M0.625488 29.666C2.5516 30.9368 4.57699 32.1283 6.70166 33.2402C8.82633 34.3324 11.0205 35.2855 13.2842 36.0996C15.5677 36.9137 17.9009 37.5591 20.2837 38.0356C22.6864 38.4924 25.1287 38.7207 27.6108 38.7207C28.564 38.7207 29.4774 38.6611 30.3511 38.542C31.2446 38.4229 32.019 38.2342 32.6743 37.9761C33.3494 37.6981 33.8856 37.3407 34.2827 36.9038C34.6997 36.4471 34.9082 35.901 34.9082 35.2656C34.9082 34.6898 34.7394 34.1139 34.4019 33.5381C34.0643 32.9424 33.409 32.3765 32.436 31.8403C31.4829 31.3042 30.1426 30.8078 28.415 30.3511C26.6875 29.8745 24.4437 29.4575 21.6836 29.1001C17.9902 28.6235 14.7834 28.008 12.063 27.2534C9.34261 26.4989 7.08887 25.5358 5.30176 24.3643C3.51465 23.1927 2.18424 21.7829 1.31055 20.1348C0.436849 18.4867 0 16.5308 0 14.2671C0 12.1027 0.486491 10.1667 1.45947 8.45898C2.45231 6.73145 3.87207 5.27197 5.71875 4.08057C7.56543 2.88916 9.80924 1.97575 12.4502 1.34033C15.0911 0.704915 18.0697 0.387207 21.3857 0.387207C22.7559 0.387207 24.1359 0.466634 25.5259 0.625488C26.9159 0.764486 28.286 0.963053 29.6362 1.22119C30.9865 1.47933 32.307 1.78711 33.5977 2.14453C34.8883 2.4821 36.0996 2.83952 37.2314 3.2168L43.0693 0H47.1499V14.2969C45.0252 13.0459 42.8807 11.9438 40.7163 10.9907C38.5718 10.0376 36.4372 9.24333 34.3125 8.60791C32.2077 7.95264 30.1426 7.46615 28.1172 7.14844C26.1117 6.81087 24.1955 6.64209 22.3687 6.64209C21.1772 6.64209 20.0951 6.73145 19.1221 6.91016C18.1689 7.08887 17.3548 7.32715 16.6797 7.625C16.0244 7.92285 15.5181 8.28027 15.1606 8.69727C14.8032 9.0944 14.6245 9.52132 14.6245 9.97803C14.6245 10.6333 14.8032 11.229 15.1606 11.7651C15.5181 12.2814 16.2131 12.7679 17.2456 13.2246C18.2782 13.6813 19.7277 14.1281 21.5942 14.5649C23.4608 14.9819 25.9032 15.4386 28.9214 15.9351C30.9269 16.2726 32.8431 16.63 34.6699 17.0073C36.4967 17.3846 38.1945 17.8413 39.7632 18.3774C41.3319 18.8937 42.7417 19.5192 43.9927 20.2539C45.2635 20.9886 46.3457 21.8722 47.2393 22.9048C48.1328 23.9373 48.8179 25.1486 49.2944 26.5386C49.7909 27.9285 50.0391 29.5469 50.0391 31.3936C50.0391 33.8558 49.4434 35.9705 48.252 37.7378C47.0605 39.505 45.4521 40.9546 43.4268 42.0864C41.4014 43.2183 39.0384 44.0522 36.3379 44.5884C33.6572 45.1245 30.8276 45.3926 27.8491 45.3926C25.0692 45.3926 22.2594 45.0947 19.4199 44.499C16.5804 43.9232 13.86 42.98 11.2588 41.6694L6.49316 44.6479H0.625488V29.666Z";
+  const S_W = 50.04, S_H = 45.39;           // S path bounding box
+  const S_CX = S_W / 2, S_CY = S_H / 2;      // scale origin = centre of the S
+  const IMAGES = [
+    "img/img-1.jpg","img/new-1.jpg","img/img-2.jpg","img/new-2.jpg","img/img-3.jpg","img/new-3.jpg",
+    "img/img-4.jpg","img/new-4.jpg","img/img-5.jpg","img/new-5.jpg","img/img-6.jpg"
+  ];
+
+  /* ---------- Timing (ms) \u2013 tweak here ---------- */
+  const T = {
+    startDelay: 150,   // empty blue before the outline starts
+    draw: 1000,        // S outline draws itself
+    hold: 80,         // pause before scaling
+    scaleUp: 600,      // S scales to SCALE_MAX while masking image 1
+    peak: 600,         // time the S stays at full scale before it starts shrinking
+    imgStep: 120,      // time per image, constant speed; starts with the mask-in and loops over the list
+    outro: 1100,       // S shrinks to header + curtain lifts
+    curtainLag: 50     // curtain starts slightly after the S
+  };
+  const SCALE_MAX = 12;
+  const FADE_AT = 0.22;   // image fades out when the S is within this share (log scale) of its final size
+  const ONLY_FIRST_LOAD = true;  // per browser session
+
+  /* ---------- Easing ---------- */
+  function bezier(x1, y1, x2, y2) {
+    const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+    const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+    const sx = t => ((ax * t + bx) * t + cx) * t;
+    const sy = t => ((ay * t + by) * t + cy) * t;
+    const dx = t => (3 * ax * t + 2 * bx) * t + cx;
+    return x => {
+      if (x <= 0) return 0; if (x >= 1) return 1;
+      let t = x;
+      for (let i = 0; i < 8; i++) { const e = sx(t) - x; const d = dx(t); if (Math.abs(e) < 1e-5 || !d) break; t -= e / d; }
+      if (t < 0 || t > 1) { let a = 0, b = 1; t = x; while (a < b) { const v = sx(t); if (Math.abs(v - x) < 1e-5) break; if (x > v) a = t; else b = t; t = (a + b) / 2; } }
+      return sy(t);
+    };
+  }
+  const E = {
+    draw:    bezier(0.65, 0, 0.35, 1),   // smooth in-out for the stroke
+    scaleUp: bezier(0.7, 0, 0.18, 1),    // slow start, fast burst, soft landing
+    outro:   bezier(0.83, 0, 0.17, 1),   // long, weighted in-out for the curtain lift
+  };
+  const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+  const prog = (t, start, dur) => clamp01((t - start) / dur);
+  const lerp = (a, b, p) => a + (b - a) * p;
+
+  /* ---------- DOM ---------- */
+  const $ = id => document.getElementById(id);
+  const loader = $("loader"), curtain = $("curtain"), stage = $("stage");
+  const imgsG = $("imgs"), clipSPath = $("clipSPath");
+  const solidCream = $("solidCream"), solidBlue = $("solidBlue"), lineS = $("lineS");
+  const rectAbove = $("rectAbove"), rectBelow = $("rectBelow");
+  const device = $("device"), app = $("app");
+
+  [clipSPath, solidCream, solidBlue].forEach(p => p.setAttribute("d", S_PATH));
+  $("navLogoPath").setAttribute("d", S_PATH);
+  $("footerSPath").setAttribute("d", S_PATH);
+  lineS.setAttribute("d", S_PATH);
+
+  const NS = "http://www.w3.org/2000/svg";
+  const imgEls = IMAGES.map(src => {
+    const im = document.createElementNS(NS, "image");
+    im.setAttribute("href", src);
+    im.setAttribute("preserveAspectRatio", "xMidYMid slice");
+    im.setAttribute("visibility", "hidden");
+    imgsG.appendChild(im);
+    return im;
+  });
+
+  /* Preload + decode so swaps never flash */
+  let imagesReady = false;
+  const preload = Promise.all(IMAGES.map(src => {
+    const i = new Image(); i.src = src;
+    return (i.decode ? i.decode() : new Promise(r => { i.onload = r; })).catch(() => {});
+  })).then(() => { imagesReady = true; });
+
+  /* ---------- Geometry ---------- */
+  let W = 0, H = 0;
+  function measure() {
+    W = loader.offsetWidth; H = loader.offsetHeight;   // layout size, unaffected by the preview scale
+    stage.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    imgEls.forEach(im => { im.setAttribute("width", W); im.setAttribute("height", H); });
+  }
+  function sTransform(cx, cy, s) {
+    return `translate(${cx - S_CX * s} ${cy - S_CY * s}) scale(${s})`;
+  }
+  function logoTarget() {
+    // nav logo box from the Figma header: left 19, top 18, 31px wide (S path is 50.04 wide)
+    const s = 31 / S_W;
+    return { s, cx: 19 + S_CX * s, cy: 18 + S_CY * s };
+  }
+  function setCurtain(y) {                       // y = curtain bottom edge in px
+    curtain.style.transform = `translate3d(0, ${y - H}px, 0)`;
+    rectAbove.setAttribute("width", W); rectAbove.setAttribute("height", Math.max(0, y));
+    rectBelow.setAttribute("y", y); rectBelow.setAttribute("width", W); rectBelow.setAttribute("height", Math.max(0, H - y));
+  }
+  function showImage(i) {
+    imgEls.forEach((im, k) => im.setAttribute("visibility", k === i ? "visible" : "hidden"));
+  }
+
+  /* ---------- Timeline ---------- */
+  const drawEnd = T.startDelay + T.draw;
+  const scaleStart = drawEnd + T.hold;
+  const scaleEnd = scaleStart + T.scaleUp;
+  const outroStart = scaleEnd + T.peak;
+  const outroEnd = outroStart + T.outro + T.curtainLag;
+
+  let raf = 0, t0 = 0, paused = 0, waitFrom = 0, target = null, current = -1;
+
+  function frame(now) {
+    if (!t0) t0 = now;
+    let t = now - t0 - paused;
+
+    // Hold on the finished outline until the images are decoded
+    if (t >= drawEnd && !imagesReady) {
+      if (!waitFrom) waitFrom = now;
+      raf = requestAnimationFrame(frame); return;
+    }
+    if (waitFrom) { paused += now - waitFrom; waitFrom = 0; t = now - t0 - paused; }
+
+    const cx = W / 2, cy = H / 2;
+
+    // 1. S outline draws itself
+    const pd = E.draw(prog(t, T.startDelay, T.draw));
+    lineS.setAttribute("stroke-dashoffset", 1 - pd);
+    lineS.setAttribute("opacity", t >= drawEnd ? 0 : 1);   // outline is replaced by the image mask in the same frame
+    lineS.setAttribute("visibility", t < T.startDelay ? "hidden" : "visible");
+
+    // 2. Outline switches to the image mask; 3. scale up
+    let s = 1, scx = cx, scy = cy;
+    let imgOp = t >= drawEnd ? 1 : 0;                    // image appears instantly, no cross-fade with the outline
+    const creamOp = imgOp;                               // cream S sits under the images
+    if (t >= scaleStart) {
+      const ps = prog(t, scaleStart, T.scaleUp);
+      s = Math.exp(lerp(0, Math.log(SCALE_MAX), E.scaleUp(ps)));
+    }
+
+    // 4. Image sequence: starts with the mask-in, constant speed, loops until the image has faded out
+    const idx = Math.floor(Math.max(0, t - drawEnd) / T.imgStep) % IMAGES.length;
+    if (idx !== current) { showImage(idx); current = idx; }
+
+    // 5. Outro: S shrinks to header, curtain lifts
+    let curtainY = H;
+    if (t >= outroStart) {
+      if (!target) target = logoTarget();
+      const po = E.outro(prog(t, outroStart, T.outro));
+      const pc = E.outro(prog(t, outroStart + T.curtainLag, T.outro));
+      s = Math.exp(lerp(Math.log(SCALE_MAX), Math.log(target.s), po));
+      scx = lerp(cx, target.cx, po);
+      scy = lerp(cy, target.cy, po);
+      // the image stays put and is masked by the shrinking S; close to the final size it fades out
+      // and the cream (blue over the page) S underneath takes over
+      const lp = (Math.log(s) - Math.log(target.s)) / (Math.log(SCALE_MAX) - Math.log(target.s));
+      imgOp = clamp01(lp / FADE_AT);
+      curtainY = lerp(H, 0, pc);
+      if (!revealFired && po > 0.35) fireReveal();
+    }
+
+    const tr = sTransform(scx, scy, s);
+    lineS.setAttribute("transform", tr);
+    clipSPath.setAttribute("transform", tr);
+    solidCream.setAttribute("transform", tr);
+    solidBlue.setAttribute("transform", tr);
+    solidCream.setAttribute("opacity", creamOp);
+    solidBlue.setAttribute("opacity", creamOp);
+    imgsG.setAttribute("opacity", imgOp);
+    setCurtain(curtainY);
+
+    if (t < outroEnd) raf = requestAnimationFrame(frame);
+    else finish();
+  }
+
+  let revealFired = false;
+  function fireReveal() { if (revealFired) return; revealFired = true; window.dispatchEvent(new Event("intro-reveal")); }
+
+  function finish() {
+    cancelAnimationFrame(raf);
+    fireReveal();
+    loader.hidden = true;
+    document.body.classList.add("ready");
+    try { sessionStorage.setItem("introSeen", "1"); } catch (e) {}
+  }
+
+  function play() {
+    cancelAnimationFrame(raf);
+    t0 = 0; paused = 0; waitFrom = 0; target = null; current = -1; revealFired = false;
+    document.body.classList.remove("ready");
+    window.dispatchEvent(new Event("intro-reset"));
+    $("scroller").scrollTop = 0;
+    document.body.classList.remove("ready");
+    loader.hidden = false;
+    measure();
+    setCurtain(H);
+    lineS.setAttribute("transform", sTransform(W / 2, H / 2, 1));
+    lineS.setAttribute("visibility", "hidden");
+    solidCream.setAttribute("opacity", 0);
+    solidBlue.setAttribute("opacity", 0);
+    imgsG.setAttribute("opacity", 0);
+    raf = requestAnimationFrame(frame);
+  }
+
+  /* Desktop preview: shrink the phone-sized mask if the window is too small to show it whole */
+  const mobile = window.matchMedia("(max-width: 450px)");
+  function fit() {
+    if (mobile.matches) { device.style.width = device.style.height = ""; app.style.transform = ""; device.style.removeProperty("--k"); return; }
+    const k = Math.min(1, (window.innerHeight - 32) / 874, (window.innerWidth - 32) / 402);
+    device.style.width = 402 * k + "px"; device.style.height = 874 * k + "px";
+    app.style.transform = `scale(${k})`; device.style.setProperty("--k", k);
+  }
+  fit();
+  window.addEventListener("resize", () => { fit(); if (!loader.hidden) { measure(); target = null; } });
+  $("replay").addEventListener("click", play);
+
+  let seen = false;
+  try { seen = sessionStorage.getItem("introSeen") === "1"; } catch (e) {}
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if ((ONLY_FIRST_LOAD && seen) || reduce) finish();
+  else play();
+})();
+
+/* ================= Page behaviour: smooth scroll, reveals, footer S ================= */
+(() => {
+  const $ = id => document.getElementById(id);
+  const sc = $("scroller");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) document.documentElement.classList.add("no-motion");
+
+  /* ---- Smooth scroll (wheel is eased, touch stays native) ---- */
+  let target = 0, cur = 0, active = false;
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  function tick() {
+    cur += (target - cur) * 0.085;
+    if (Math.abs(target - cur) < 0.25) { cur = target; active = false; }
+    sc.scrollTop = cur;
+    if (active) requestAnimationFrame(tick);
+  }
+  sc.addEventListener("wheel", e => {
+    if (e.ctrlKey || reduce || !document.body.classList.contains("ready")) return;
+    e.preventDefault();
+    const max = sc.scrollHeight - sc.clientHeight;
+    if (!active) { target = cur = sc.scrollTop; }
+    target = clamp(target + e.deltaY * (e.deltaMode === 1 ? 32 : 1), 0, max);
+    if (!active) { active = true; requestAnimationFrame(tick); }
+  }, { passive: false });
+  sc.addEventListener("scroll", () => { if (!active) target = cur = sc.scrollTop; }, { passive: true });
+  window.addEventListener("intro-reset", () => {      // Replay intro: jump to the very top (and drop any eased-scroll target)
+    active = false; target = cur = 0;
+    sc.scrollTo({ top: 0, behavior: "instant" }); sc.scrollTop = 0;
+    requestAnimationFrame(() => { target = cur = 0; sc.scrollTop = 0; });
+  });
+
+  /* ---- Line-by-line text split ---- */
+  function split(el) {
+    if (el.dataset.orig === undefined) el.dataset.orig = el.innerHTML;
+    el.innerHTML = el.dataset.orig;
+    const label = el.textContent.replace(/\s+/g, " ").trim();
+    // 1. wrap every word, keep <br> as hard breaks
+    const frag = document.createDocumentFragment();
+    const walk = node => {
+      node.childNodes.forEach(n => {
+        if (n.nodeType === 3) {
+          n.textContent.split(/(\s+)/).forEach(tok => {
+            if (!tok) return;
+            if (/^\s+$/.test(tok)) frag.appendChild(document.createTextNode(" "));
+            else { const w = document.createElement("span"); w.className = "w"; w.textContent = tok; frag.appendChild(w); }
+          });
+        } else if (n.nodeName === "BR") frag.appendChild(document.createElement("br"));
+        else walk(n);
+      });
+    };
+    walk(el);
+    el.textContent = ""; el.appendChild(frag);
+    // 2. group words by their rendered line
+    const lines = []; let lastTop = null, brk = false;
+    [...el.childNodes].forEach(n => {
+      if (n.nodeName === "BR") { brk = true; return; }
+      if (n.nodeType !== 1) return;
+      const top = Math.round(n.offsetTop);
+      if (lastTop === null || brk || Math.abs(top - lastTop) > 4) { lines.push([]); lastTop = top; brk = false; }
+      lines[lines.length - 1].push(n.textContent);
+    });
+    // 3. rebuild as masked lines
+    el.textContent = "";
+    el.setAttribute("aria-label", label);
+    lines.forEach((words, li) => {
+      const ln = document.createElement("span"); ln.className = "ln"; ln.setAttribute("aria-hidden", "true");
+      words.forEach((wd, k) => {
+        if (k) ln.appendChild(document.createTextNode(" "));
+        const inner = document.createElement("span"); inner.className = "ln-i";
+        inner.style.setProperty("--l", li); inner.style.setProperty("--w", k);
+        inner.textContent = wd; ln.appendChild(inner);
+      });
+      el.appendChild(ln);
+    });
+    if (el.dataset.ls) el.style.setProperty("--ls", el.dataset.ls + "ms");
+    if (el.dataset.d) el.style.setProperty("--d", el.dataset.d + "ms");
+    el.classList.add("split");
+  }
+  const splitAll = () => document.querySelectorAll("[data-split]").forEach(split);
+
+  /* ---- Reveal on scroll ---- */
+  let io = null, footIO = null, ioFoot = null, ioEarly = null, armed = false;
+  function arm() {
+    if (armed) return; armed = true;
+    io = new IntersectionObserver(entries => entries.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+    }), { root: sc, rootMargin: "0px 0px -20% 0px", threshold: 0 });
+    // elements inside the footer can't cross the 80% line at max scroll, so they use the plain viewport edge
+    ioFoot = new IntersectionObserver(entries => entries.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add("in"); ioFoot.unobserve(en.target); }
+    }), { root: sc, threshold: 0 });
+    // catalogue thumbnails reveal a little earlier (6% instead of 20% above the bottom edge)
+    ioEarly = new IntersectionObserver(entries => entries.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add("in"); ioEarly.unobserve(en.target); }
+    }), { root: sc, rootMargin: "0px 0px -6% 0px", threshold: 0 });
+    document.querySelectorAll("[data-split]:not([data-manual]),[data-fade],[data-media]").forEach(el => (el.closest("#footer, #heroLow") ? ioFoot : el.classList.contains("dept-img") ? ioEarly : io).observe(el));
+    footIO = new IntersectionObserver(entries => entries.forEach(en => {
+      if (en.isIntersecting) { $("footerS").classList.add("draw"); footIO.disconnect(); }
+    }), { root: sc, rootMargin: "0px 0px -20% 0px", threshold: 0 });
+    footIO.observe($("footerS"));
+  }
+  function disarm() {
+    armed = false;
+    if (io) io.disconnect(); if (ioEarly) ioEarly.disconnect(); if (footIO) footIO.disconnect(); if (ioFoot) ioFoot.disconnect();
+    document.querySelectorAll(".in").forEach(el => el.classList.remove("in"));
+    $("footerS").classList.remove("draw");
+  }
+  /* ---- Hero sequence: pinned, scrubbed by scroll ---- */
+  const seq = $("seq"), pin = $("pin"), heroTxt = $("heroTxt"), heroMedia = $("heroMedia"), heroLow = $("heroLow"), cap = $("cap");
+  const clamp01 = v => Math.min(1, Math.max(0, v));
+  const SEQ = { imgTop0: 505, imgH0: 352, gap: 10, top1: 16, dist: 0.85 };
+  let lowH = 0, Hh = 0, sliderReady = false;
+  function measureSeq() {
+    Hh = sc.clientHeight;
+    pin.style.height = Hh + "px";
+    seq.style.height = Hh + Hh * SEQ.dist + "px";
+    lowH = heroLow.offsetHeight;
+    heroLow.style.height = "";
+    layoutSeq();
+  }
+  function layoutSeq() {
+    const D = Hh * SEQ.dist;
+    const p = clamp01((sc.scrollTop - seq.offsetTop) / D);
+    const e = p;                                   // linear scrub (the scroll itself is smoothed)
+    const imgH1 = Hh - SEQ.top1 - SEQ.gap - lowH;
+    const top = SEQ.imgTop0 + (SEQ.top1 - SEQ.imgTop0) * e;
+    const hgt = SEQ.imgH0 + (imgH1 - SEQ.imgH0) * e;
+    heroMedia.style.top = top + "px"; heroMedia.style.height = hgt + "px";
+    heroLow.style.top = top + hgt + SEQ.gap + "px";
+    const t = clamp01(p / 0.4);
+    heroTxt.style.transform = `translate3d(0,${(-46 * t).toFixed(1)}px,0)`;
+    heroTxt.style.opacity = (1 - clamp01(p / 0.32)).toFixed(3);
+    if (p > 0.04) capIn(); else if (p < 0.01) capReset();
+  }
+  sc.addEventListener("scroll", layoutSeq, { passive: true });
+  window.addEventListener("resize", measureSeq);
+
+  /* ---- Slider: same mechanics as Haven's Swiper (loop, 1 slide/view, .55s ease, autoplay 2s, 40% parallax on the media) ---- */
+  const slides = $("slides"), sFill = $("sFill"), sPrev = $("sPrev"), sNext = $("sNext");
+  const reals = [...slides.children], sN = reals.length;
+  slides.insertBefore(reals[sN - 1].cloneNode(true), reals[0]); slides.appendChild(reals[0].cloneNode(true));
+  const tracks = [...slides.children];
+  let t = 1, dragX = 0, dragging = false, startX = 0, moved = false, ap = null, apOn = false, capShown = false;
+  const sw = () => heroMedia.clientWidth, PAR = 0.4;
+  const logical = () => ((t - 1) % sN + sN) % sN;
+  function paint(tf, px) {
+    const W = sw();
+    slides.style.transform = px ? `translate3d(${-tf * W}px,0,0)` : `translate3d(${-tf * 100}%,0,0)`;
+    tracks.forEach((sl, i) => {
+      const d = Math.max(-1, Math.min(1, i - tf));
+      sl.firstElementChild.style.transform = px ? `translate3d(${-d * PAR * W}px,0,0)` : `translate3d(${-d * PAR * 100}%,0,0)`;
+    });
+  }
+  function bar() { sFill.style.width = 100 / sN + "%"; sFill.style.transform = `translate3d(${logical() * 100}%,0,0)`; }
+  const CAPS = [["Lot 522", "Hans J. Wegner, Armchair \u201cGE 260\u201d"], ["Lot 214", "Blue and white bowl, China, Qing dynasty"], ["Lot 522", "Hans J. Wegner, Armchair \u201cGE 260\u201d"], ["Lot 214", "Blue and white bowl, China, Qing dynasty"]];
+  function setCap() {
+    const [a, b] = CAPS[logical() % CAPS.length], els = cap.querySelectorAll("[data-split]");
+    [a, b].forEach((txt, i) => { els[i].dataset.orig = txt; split(els[i]); });
+  }
+  const capSplits = () => [...cap.querySelectorAll("[data-split]")];
+  function capIn() { if (capShown) return; capShown = true; cap.classList.remove("out"); cap.classList.add("show"); capSplits().forEach(el => el.classList.add("in")); }
+  function capReset() { if (!capShown) return; capShown = false; cap.classList.remove("show", "out"); capSplits().forEach(el => el.classList.remove("in")); }
+  let capT = null;
+  function capSwap() {            // fade out with ease, then play the text reveal again for the new slide
+    if (!capShown) return;
+    cap.classList.add("out");
+    clearTimeout(capT); capT = setTimeout(() => {
+      setCap(); capSplits().forEach(el => el.classList.remove("in"));
+      void cap.offsetWidth; cap.classList.remove("out");
+      requestAnimationFrame(() => requestAnimationFrame(() => capSplits().forEach(el => el.classList.add("in"))));
+    }, 460);
+  }
+  function schedule(d) { clearTimeout(ap); if (apOn) ap = setTimeout(() => { if (!dragging && !document.hidden) go(t + 1); else schedule(); }, d == null ? 2000 : d); }
+  function go(n) {
+    const same = n === t; t = n; slides.classList.remove("nt"); paint(t); bar(); if (!same) capSwap(); clearTimeout(ap); if (same) schedule();
+  }
+  slides.addEventListener("transitionend", e => {
+    if (e.target !== slides) return;
+    if (t === sN + 1 || t === 0) {      // jumped onto a clone: reset to the real slide without animation
+      t = t === 0 ? sN : 1; slides.classList.add("nt"); paint(t); void slides.offsetWidth; slides.classList.remove("nt");
+    }
+    schedule();
+  });
+  sPrev.addEventListener("click", () => go(t - 1)); sNext.addEventListener("click", () => go(t + 1));
+  slides.addEventListener("pointerdown", e => { dragging = true; moved = false; startX = e.clientX; dragX = 0; clearTimeout(ap); slides.classList.add("drag"); slides.setPointerCapture(e.pointerId); });
+  slides.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    dragX = e.clientX - startX; if (Math.abs(dragX) > 4) moved = true;
+    paint(t - dragX / sw(), true);
+  });
+  const endDrag = () => {
+    if (!dragging) return; dragging = false; slides.classList.remove("drag");
+    const th = Math.min(60, sw() * 0.2);
+    paint(t, false);                // switch back to % units for the settle
+    if (dragX < -th) go(t + 1); else if (dragX > th) go(t - 1); else { go(t); }
+  };
+  slides.addEventListener("pointerup", endDrag); slides.addEventListener("pointercancel", endDrag);
+  slides.classList.add("nt"); paint(t); bar(); void slides.offsetWidth; slides.classList.remove("nt");
+  window.addEventListener("intro-reveal", () => { heroMedia.classList.add("go"); apOn = true; schedule(3000); });
+  window.addEventListener("intro-reset", () => { heroMedia.classList.remove("go"); apOn = false; clearTimeout(ap); clearTimeout(capT); capReset();
+    t = 1; dragging = false; slides.classList.remove("drag"); slides.classList.add("nt"); paint(t); bar(); setCap(); void slides.offsetWidth; slides.classList.remove("nt"); });
+  if (document.body.classList.contains("ready")) { heroMedia.classList.add("go"); apOn = true; schedule(3000); }
+
+  /* ---- Nav logo: brand blue, cream over the dark/blue sections ---- */
+  const logo = $("navLogo"), darks = [...document.querySelectorAll(".navy, .footer")];
+  function logoTone() {
+    const ar = $("app").getBoundingClientRect(), k = ar.height / ($("app").offsetHeight || 1);
+    const y = ar.top + 50 * k;
+    logo.classList.toggle("on-dark", darks.some(d => { const r = d.getBoundingClientRect(); return r.top <= y && r.bottom > y; }));
+  }
+  sc.addEventListener("scroll", logoTone, { passive: true });
+  window.addEventListener("resize", logoTone);
+
+
+
+  /* ---- Scroll-scrubbed sequences ("How can we help" / consign): text fades up slowly, frames play, then the steps appear ---- */
+  function scrubSeq(c) {
+    const hseq = $(c.seq), hpin = $(c.pin), hTxt = $(c.txt), hBox = $(c.box), hCv = $(c.cv), hLow = $(c.low);
+    if (!hseq) return;
+    const HF = c.count, HD = c.dist, HS = c.from, HE = c.to, H_PLAY = 0.84;
+    const frames = new Array(HF), ctx = hCv.getContext("2d");
+    let hH = 0, hLast = -1, hTop = 0;
+    const offTop = el => { let y = 0, e = el; while (e && e !== sc) { y += e.offsetTop; e = e.offsetParent; } return y; };
+    function sizeCv() { const w = hBox.clientWidth, d = Math.min(2, window.devicePixelRatio || 1); hCv.width = Math.round(w * d); hCv.height = Math.round(w * 950 / 804 * d); hLast = -1; }
+    function drawF(i) {
+      let k = i; while (k >= 0 && !(frames[k] && frames[k].complete && frames[k].naturalWidth)) k--;
+      if (k < 0) { k = i; while (k < HF && !(frames[k] && frames[k].complete && frames[k].naturalWidth)) k++; }
+      if (k < 0 || k >= HF || k === hLast) return;
+      hLast = k; ctx.drawImage(frames[k], 0, 0, hCv.width, hCv.height);
+    }
+    function loadFrames() {
+      const order = []; for (let i = 0; i < HF; i += 8) order.push(i); for (let i = 0; i < HF; i++) if (i % 8) order.push(i);
+      order.forEach(i => { const im = new Image(); im.decoding = "async"; im.onload = () => { hLast = -1; layoutH(); }; im.src = c.dir + "/f" + String(i + 1).padStart(3, "0") + ".webp"; frames[i] = im; });
+    }
+    function measureH() { hH = sc.clientHeight; const pinH = Math.min(hH, hLow.offsetTop + hLow.offsetHeight + (c.pad == null ? 32 : c.pad)); hpin.style.height = pinH + "px"; hseq.style.height = pinH + hH * HD + "px"; hTop = offTop(hseq); sizeCv(); layoutH(); }
+    function layoutH() {
+      if (!hH) return;
+      const lead = c.ctr == null ? 0 : Math.max(0, hH * 0.5 - c.ctr), run = hH * HD + lead, p = clamp01((sc.scrollTop - (hTop - lead)) / run), f = clamp01(p / H_PLAY);
+      drawF(Math.round(f * (HF - 1)));
+      const scrolled = Math.max(0, p * run - lead);
+      hTxt.style.opacity = (1 - clamp01(p / 0.26)).toFixed(3);
+      hTxt.style.transform = `translate3d(0,${(-scrolled * 0.28).toFixed(1)}px,0)`;
+      hBox.style.transform = `translate3d(0,${((HE - HS) * f).toFixed(1)}px,0)`;
+      const done = p >= 0.9;
+      if (done !== hseq.classList.contains("done")) {
+        hseq.classList.toggle("done", done);
+        if (done) hLow.querySelectorAll(".hs").forEach((el, i) => el.style.setProperty("--d", i * 90 + "ms"));
+      }
+    }
+    sc.addEventListener("scroll", layoutH, { passive: true });
+    window.addEventListener("resize", measureH);
+    loadFrames(); measureH();
+    window.addEventListener("load", measureH);
+    ((document.fonts && document.fonts.ready) || Promise.resolve()).then(() => requestAnimationFrame(() => { measureH(); setTimeout(measureH, 600); }));
+  }
+  scrubSeq({ seq: "hseq", pin: "hpin", txt: "hTxt", box: "hBox", cv: "hCv", low: "hLow", dir: "assets/clock", count: 97, dist: 1.7, from: 190, to: 31, pad: 16 });
+  scrubSeq({ seq: "hseq2", pin: "hpin2", txt: "hTxt2", box: "hBox2", cv: "hCv2", low: "hLow2", dir: "assets/cartier", count: 121, dist: 1.7, from: 0, to: 31, ctr: 125 });
+
+  /* ---- Menu: hamburger -> X (\u00b115deg), card opens with a .5s grid-row ease, accordions grow the card ---- */
+  const mBtn = document.querySelector(".nav-menu"), menuEl = $("menu");
+  let mOpen = false, flatT;
+  function setMenu(o) {
+    mOpen = o; clearTimeout(flatT);
+    document.body.classList.toggle("menu-open", o); menuEl.setAttribute("aria-hidden", o ? "false" : "true"); mBtn.setAttribute("aria-expanded", o);
+    if (o) document.body.classList.add("menu-flat"); else flatT = setTimeout(() => document.body.classList.remove("menu-flat"), 600);
+  }
+  mBtn.addEventListener("click", () => setMenu(!mOpen));
+  window.addEventListener("intro-reset", () => { if (mOpen) setMenu(false); });
+  $("mShade").addEventListener("click", () => setMenu(false));
+  window.addEventListener("keydown", e => { if (e.key === "Escape" && mOpen) setMenu(false); });
+  menuEl.querySelectorAll(".m-item > button").forEach(b => b.addEventListener("click", () => {
+    const it = b.parentElement, o = !it.classList.contains("open"); it.classList.toggle("open", o); b.setAttribute("aria-expanded", o);
+  }));
+
+  /* ---- Footer parallax reveal (as on Haven): content slides down from -250px while an overlay fades out ---- */
+  const footer = $("footer"), fIn = $("fIn"), fOv = $("fOv");
+  function footerParallax() {
+    const H = sc.clientHeight, top = footer.getBoundingClientRect().top - sc.getBoundingClientRect().top;
+    const range = Math.min(H, footer.offsetHeight);
+    const p = Math.min(1, Math.max(0, (H - top) / range));
+    fIn.style.transform = `translate3d(0,${(-250 * Math.pow(1 - p, 1.7)).toFixed(2)}px,0)`;
+    fOv.style.opacity = (0.4 * Math.pow(Math.max(0, 1 - p / 0.45), 2)).toFixed(3);
+  }
+  sc.addEventListener("scroll", footerParallax, { passive: true });
+  window.addEventListener("resize", footerParallax);
+  footerParallax();
+  window.addEventListener("intro-reveal", arm);
+  window.addEventListener("intro-reset", disarm);
+  if (document.body.classList.contains("ready")) arm(); // intro skipped (reload) before listeners existed
+
+  const ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  ready.then(() => requestAnimationFrame(() => { splitAll(); measureSeq(); logoTone(); }));
+  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { splitAll(); measureSeq(); }, 150); });
+})();
+
+</script>
